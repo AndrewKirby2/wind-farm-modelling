@@ -22,12 +22,12 @@ X = training_data[:,:3]
 y = training_data[:,3]
 
 #load wake model prior mean
-prior_mean = np.genfromtxt('local_turbine_thrust_ceofficient_predictions.csv', delimiter=',')[1:,1]
+prior_mean = np.genfromtxt('local_turbine_thrust_coefficient_predictions.csv', delimiter=',')[1:,1]
 
 ctstar_statistical_model = np.zeros(50)
 prediction_error = np.zeros(50)
 
-print('Test point   Mean Absolute Error (%)')
+print('Test point   Absolute Error (%)')
 
 #perform LOOCV
 loo = LeaveOneOut()
@@ -49,8 +49,8 @@ for train_index, test_index in loo.split(X):
 
     #make prediction on data point left out of training set
     X_test_stan = scaler.transform(X_test)
-    error[test_index] = mean_absolute_error(y_test, gp.predict(X_test_stan) + 
+    prediction_error[test_index] = mean_absolute_error(y_test, gp.predict(X_test_stan) + 
       prior_mean[test_index])/0.75
     ctstar_statistical_model[test_index] = gp.predict(X_test_stan) + prior_mean[test_index]
     
-    print(test_index,'          ', 100*error[test_index])
+    print(test_index,'          ', 100*prediction_error[test_index])

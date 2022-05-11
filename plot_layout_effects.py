@@ -62,8 +62,6 @@ for i in range(6):
     # 2. Predict Cp using two-scale momentum
     # theory
     #############################################
-	
-    effective_area_ratio_theory = np.linspace(0,20,50)
 
     #predict Cp for each wind farm LES
     for run_no in range(50):
@@ -76,51 +74,69 @@ for i in range(6):
 	    #analytical model gives ct_star = 0.75
 	    #divide by correction factor (N^2=0.8037111)
             ct_star_adj = 0.75 / 0.8037111
-            return ct_star_adj*effective_area_ratio_theory[run_no]*beta**2 + beta**gamma - 1 -zeta[i]*(1-beta)
+            return ct_star_adj*effective_area_ratio[run_no]*beta**2 + beta**gamma - 1 -zeta[i]*(1-beta)
 
         beta_theory = sp.bisect(NDFM,0,1)
         cp_nishino[run_no,i] = 0.75**1.5 * beta_theory**3 * 1.33**-0.5
 
 fig, ax = plt.subplots(nrows=3, ncols=2, figsize=[5.33,6.6], dpi=600)
-ax[0,0].plot(effective_area_ratio_theory[12:], cp_nishino[12:,0])
-pcm = ax[0,0].scatter(effective_area_ratio, training_data[:,7], s=5, c=training_data[:,3])
+pcm = ax[0,0].scatter(effective_area_ratio, 100*(cp_finite[:,0]-cp_nishino[:,0])/cp_nishino[:,0], s=5, c=training_data[:,3])
 ax[0,0].set_xlabel(r'$\lambda/C_{f0}$')
-ax[0,0].set_ylabel(r'$C_p$')
+ax[0,0].set_ylabel(r'Layout effects (%)')
+ax[0,0].set_ylim([-25,5])
 ax[0,0].set_title('a)', loc='left')
+ax[0,0].minorticks_on()
+ax[0,0].grid(which='major', axis='y', color='k')
+ax[0,0].grid(which='minor', axis='y', linestyle='--')
 
-ax[0,1].plot(effective_area_ratio_theory[12:], cp_nishino[12:,1])
-ax[0,1].scatter(effective_area_ratio, cp_finite[:,1], s=5, c=training_data[:,3])
+ax[0,1].scatter(effective_area_ratio, 100*(cp_finite[:,1]-cp_nishino[:,1])/cp_nishino[:,1], s=5, c=training_data[:,3])
 ax[0,1].set_xlabel(r'$\lambda/C_{f0}$')
-ax[0,1].set_ylabel(r'$C_{p,finite}$')
+ax[0,1].set_ylabel(r'Layout effects (%)')
+ax[0,1].set_ylim([-25,5])
 ax[0,1].set_title('b)', loc='left')
+ax[0,1].minorticks_on()
+ax[0,1].grid(which='major', axis='y', color='k')
+ax[0,1].grid(which='minor', axis='y', linestyle='--')
 
-ax[1,0].plot(effective_area_ratio_theory[12:], cp_nishino[12:,2])
-ax[1,0].scatter(effective_area_ratio, cp_finite[:,2], s=5, c=training_data[:,3])
+ax[1,0].scatter(effective_area_ratio, 100*(cp_finite[:,2]-cp_nishino[:,2])/cp_nishino[:,2], s=5, c=training_data[:,3])
 ax[1,0].set_xlabel(r'$\lambda/C_{f0}$')
-ax[1,0].set_ylabel(r'$C_{p.finite}$')
+ax[1,0].set_ylabel(r'Layout effects (%)')
+ax[1,0].set_ylim([-25,5])
 ax[1,0].set_title('c)', loc='left')
+ax[1,0].minorticks_on()
+ax[1,0].grid(which='major', axis='y', color='k')
+ax[1,0].grid(which='minor', axis='y', linestyle='--')
 
-ax[1,1].plot(effective_area_ratio_theory[12:], cp_nishino[12:,3])
-ax[1,1].scatter(effective_area_ratio, cp_finite[:,3], s=5, c=training_data[:,3])
+ax[1,1].scatter(effective_area_ratio, 100*(cp_finite[:,3]-cp_nishino[:,3])/cp_nishino[:,3], s=5, c=training_data[:,3])
 ax[1,1].set_xlabel(r'$\lambda/C_{f0}$')
-ax[1,1].set_ylabel(r'$C_{p,finite}$')
+ax[1,1].set_ylabel(r'Layout effects (%)')
+ax[1,1].set_ylim([-25,5])
 ax[1,1].set_title('d)', loc='left')
+ax[1,1].minorticks_on()
+ax[1,1].grid(which='major', axis='y', color='k')
+ax[1,1].grid(which='minor', axis='y', linestyle='--')
 
-ax[2,0].plot(effective_area_ratio_theory[12:], cp_nishino[12:,4])
-ax[2,0].scatter(effective_area_ratio, cp_finite[:,4], s=5, c=training_data[:,3])
+ax[2,0].scatter(effective_area_ratio, 100*(cp_finite[:,4]-cp_nishino[:,4])/cp_nishino[:,4], s=5, c=training_data[:,3])
 ax[2,0].set_xlabel(r'$\lambda/C_{f0}$')
-ax[2,0].set_ylabel(r'$C_{p,finite}$')
+ax[2,0].set_ylabel(r'Layout effects (%)')
+ax[2,0].set_ylim([-25,5])
 ax[2,0].set_title('e)', loc='left')
+ax[2,0].minorticks_on()
+ax[2,0].grid(which='major', axis='y', color='k')
+ax[2,0].grid(which='minor', axis='y', linestyle='--')
 
-ax[2,1].plot(effective_area_ratio_theory[12:], cp_nishino[12:,5])
-ax[2,1].scatter(effective_area_ratio, cp_finite[:,5], s=5, c=training_data[:,3])
+ax[2,1].scatter(effective_area_ratio, 100*(cp_finite[:,5]-cp_nishino[:,5])/cp_nishino[:,5], s=5, c=training_data[:,3])
 ax[2,1].set_xlabel(r'$\lambda/C_{f0}$')
-ax[2,1].set_ylabel(r'$C_{p,finite}$')
+ax[2,1].set_ylabel(r'Layout effects (%)')
+ax[2,1].set_ylim([-25,5])
 ax[2,1].set_title('f)', loc='left')
+ax[2,1].minorticks_on()
+ax[2,1].grid(which='major', axis='y', color='k')
+ax[2,1].grid(which='minor', axis='y', linestyle='--')
 
 plt.tight_layout()
 
 cbar = fig.colorbar(pcm, ax=ax.ravel().tolist(), shrink=0.97)
 cbar.set_label(r'$C_T^*$')
 
-plt.savefig('LES_cp_results.png', bbox_inches='tight')
+plt.savefig('LES_layout_effects.png', bbox_inches='tight')

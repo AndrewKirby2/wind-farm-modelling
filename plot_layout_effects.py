@@ -135,6 +135,7 @@ ax[2,1].grid(which='major', axis='y', color='k')
 ax[2,1].grid(which='minor', axis='y', linestyle='--')
 
 plt.tight_layout()
+plt.subplots_adjust(wspace=0.5)
 
 cbar = fig.colorbar(pcm, ax=ax.ravel().tolist(), shrink=0.97)
 cbar.set_label(r'$C_T^*$')

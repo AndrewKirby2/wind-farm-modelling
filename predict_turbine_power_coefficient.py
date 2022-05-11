@@ -7,7 +7,6 @@ wind farm "extractability"
 import numpy as np
 import scipy.optimize as sp
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_absolute_percentage_error
 
 #wind farm parameters
 #momentum `extractability' factor

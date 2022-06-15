@@ -1,7 +1,8 @@
-"""1. Calculate Cp from LES data different
+"""1. Correct LES wind speed 
+2. Calculate Cp from LES data different
 wind farm "extractability"
-2. Predict Cp using two scale momentum theory
-3. Plot results
+3. Predict Cp using two scale momentum theory
+4. Plot results
 """
 
 import numpy as np
@@ -25,21 +26,65 @@ training_data = np.genfromtxt('LES_training_data.csv', delimiter=',')
 training_data = np.delete(training_data, 0, 0)
 training_data = np.delete(training_data, 0, 1)
 
+#note correction factor N^2 already applied!
+ct_star = training_data[:,3]
 beta = training_data[:,5]
+#note correction factor N^3 already applied!
 cp = training_data[:,7]
+cp_corrected = np.zeros((50))
+beta_corrected = np.zeros((50))
+
+################################
+#1. Correct LES wind speed
+################################
+
+for run_no in range(50):
+
+        #calculate effective area ratio
+        C_f0 = 0.28641758**2/(0.5*10.10348311**2)
+        A = np.pi/4
+        S = training_data[run_no,0]*training_data[run_no,1]
+        area_ratio = A/S
+        effective_area_ratio[run_no] = area_ratio/C_f0
+
+        #calculate beta_fine_theory
+        def NDFM(beta):
+            """ Non-dimensional farm momentum
+            equation (see Nishino 2020)
+            """
+	    #use ct_star to predict beta_fine_theory
+            return ct_star[run_no]*effective_area_ratio[run_no]*beta**2 + beta**gamma - 1
+
+        beta_fine_theory = sp.bisect(NDFM,0,1)
+
+        #calculate beta_coarse_theory
+        def NDFM(beta):
+            """ Non-dimensional farm momentum
+            equation (see Nishino 2020)
+            """
+	    #use ct_star to predict beta_fine_theory
+            return (ct_star[run_no]/ 0.8037111)*effective_area_ratio[run_no]*beta**2 + beta**gamma - 1
+
+        beta_coarse_theory = sp.bisect(NDFM,0,1)
+
+        #correct Cp values recorded by LES
+        cp_corrected[run_no] = cp[run_no]*(beta_fine_theory/beta_coarse_theory)**3
+        #correct beta value recorded by LES
+        beta_corrected[run_no] = beta[run_no]*(beta_fine_theory/beta_coarse_theory)
+
 
 #repeat for different zeta values
 for i in range(6):
 
     #############################################
-    # 1. Calculate Cp from LES data for a finite
+    # 2. Calculate Cp from LES data for a finite
     # wind farm
     #############################################
 
     #calculate adjusted Cp and effective area ratio
     #for each wind farm LES
     for run_no in range(50):
-        U_F = beta[run_no]*10.10348311
+        U_F = beta_corrected[run_no]*10.10348311
         U_F0 = 10.10348311
 
         #coefficients of quadratic formula to solve
@@ -49,17 +94,10 @@ for i in range(6):
 
         U_Fprime = (-b + np.sqrt(b**2 - 4*a*c))/(2*a)
     
-        cp_finite[run_no,i] = cp[run_no]*(U_Fprime/U_F)**3
-
-        #calculate effective area ratio
-        C_f0 = 0.28641758**2/(0.5*10.10348311**2)
-        A = np.pi/4
-        S = training_data[run_no,0]*training_data[run_no,1]
-        area_ratio = A/S
-        effective_area_ratio[run_no] = area_ratio/C_f0
+        cp_finite[run_no,i] = cp_corrected[run_no]*(U_Fprime/U_F)**3
 
     #############################################
-    # 2. Predict Cp using two-scale momentum
+    # 3. Predict Cp using two-scale momentum
     # theory
     #############################################
 	
@@ -72,18 +110,20 @@ for i in range(6):
             """ Non-dimensional farm momentum
             equation (see Nishino 2020)
             """
-	    #use uncorrected ct_star to predict beta
+	    #use ct_star to predict beta
 	    #analytical model gives ct_star = 0.75
-	    #divide by correction factor (N^2=0.8037111)
-            ct_star_adj = 0.75 / 0.8037111
+            ct_star_adj = 0.75
             return ct_star_adj*effective_area_ratio_theory[run_no]*beta**2 + beta**gamma - 1 -zeta[i]*(1-beta)
 
         beta_theory = sp.bisect(NDFM,0,1)
         cp_nishino[run_no,i] = 0.75**1.5 * beta_theory**3 * 1.33**-0.5
 
+#############################################
+# 4. Plot results
+#############################################
 fig, ax = plt.subplots(nrows=3, ncols=2, figsize=[5.33,6.6], dpi=600)
 ax[0,0].plot(effective_area_ratio_theory[12:], cp_nishino[12:,0])
-pcm = ax[0,0].scatter(effective_area_ratio, training_data[:,7], s=5, c=training_data[:,3])
+pcm = ax[0,0].scatter(effective_area_ratio, cp_finite[:,0], s=5, c=training_data[:,3])
 ax[0,0].set_xlabel(r'$\lambda/C_{f0}$')
 ax[0,0].set_ylabel(r'$C_p$')
 ax[0,0].set_title('a)', loc='left')

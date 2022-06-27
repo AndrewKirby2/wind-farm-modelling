@@ -22,7 +22,7 @@ Make a plot of turbine power coefficients
 ```
 python predict_turbine_power_coefficient.py
 ```
-Make of plot of layout effects
+Make of plots of loss factors
 ```
 python plot_layout_effects.py
 ```
